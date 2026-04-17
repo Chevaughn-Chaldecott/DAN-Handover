@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAN Handover Checklist</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --border: #e2e0d9;
+    --border-hover: #c8c5bc;
+    --text: #1a1917;
+    --text-muted: #6b6860;
+    --text-faint: #a8a59e;
+    --green: #1a7a4a;
+    --green-bg: #edf7f2;
+    --green-border: #b3ddc7;
+    --amber: #92600a;
+    --amber-bg: #fef8ee;
+    --red: #c0392b;
+    --red-bg: #fdf2f1;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 3px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* Progress */
+  .progress-block {
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 6px;
+    background: var(--green);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .progress-label {
+    font-size: 13px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* Share box */
+  .share-box {
+    background: var(--amber-bg);
+    border: 1px solid #e8d5a8;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 1.5rem;
+  }
+
+  .share-box p {
+    font-size: 13px;
+    color: var(--amber);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .share-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .share-url {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 7px 10px;
+    border: 1px solid #e8d5a8;
+    border-radius: 6px;
+    background: #fffdf7;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: default;
+  }
+
+  .copy-btn {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    background: var(--amber);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+
+  .copy-btn:hover { opacity: 0.88; }
+  .copy-btn.copied { background: var(--green); }
+
+  /* Sections */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s;
+  }
+
+  .section-header:hover { background: #faf9f7; }
+
+  .chevron {
+    font-size: 10px;
+    color: var(--text-faint);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .chevron.open { transform: rotate(90deg); }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .section-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  .section-meta.complete { color: var(--green); }
+
+  .del-section {
+    font-size: 12px;
+    color: var(--text-faint);
+    padding: 2px 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.1s, background 0.1s;
+  }
+  .del-section:hover { color: var(--red); background: var(--red-bg); }
+
+  .section-body {
+    border-top: 1px solid var(--border);
+    display: none;
+  }
+
+  .section-body.open { display: block; }
+
+  /* Tasks */
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 16px;
+    border-bottom: 1px solid #f0ede8;
+    transition: background 0.1s;
+  }
+
+  .task-row:last-of-type { border-bottom: none; }
+  .task-row:hover { background: #faf9f7; }
+
+  .task-check {
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    cursor: pointer;
+    margin-top: 3px;
+    accent-color: var(--green);
+  }
+
+  .task-content { flex: 1; }
+
+  .task-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .task-text.done {
+    text-decoration: line-through;
+    color: var(--text-faint);
+  }
+
+  .task-note {
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-top: 2px;
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  .task-del {
+    font-size: 12px;
+    color: var(--text-faint);
+    padding: 2px 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.1s, color 0.1s;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .task-row:hover .task-del { opacity: 1; }
+  .task-del:hover { color: var(--red); }
+
+  /* Add task row */
+  .add-task-row {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #faf9f7;
+    border-top: 1px solid #f0ede8;
+  }
+
+  .add-task-row input {
+    flex: 1;
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .add-task-row input:focus { border-color: var(--border-hover); }
+  .add-task-row input::placeholder { color: var(--text-faint); }
+
+  .add-task-row button {
+    font-family: var(--sans);
+    font-size: 12px;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .add-task-row button:hover { border-color: var(--border-hover); color: var(--text); }
+
+  /* Add section */
+  .add-section-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+
+  .add-section-row input {
+    flex: 1;
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .add-section-row input:focus { border-color: var(--border-hover); }
+  .add-section-row input::placeholder { color: var(--text-faint); }
+
+  .add-section-row button {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+
+  .add-section-row button:hover { border-color: var(--border-hover); color: var(--text); }
+
+  .footer-note {
+    margin-top: 2rem;
+    font-size: 12px;
+    color: var(--text-faint);
+    text-align: center;
+    font-family: var(--mono);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>DAN Handover Checklist</h1>
+    <p>Dial a Nerd departure checklist — tick items, then copy the shareable link to sync with your teammate.</p>
+  </div>
+
+  <div class="progress-block">
+    <div class="progress-track"><div class="progress-fill" id="pbar"></div></div>
+    <div class="progress-label" id="pstat">0 / 0</div>
+  </div>
+
+  <div class="share-box">
+    <p>&#128279; Tick your items, then click <strong>Copy link</strong> and send it to your teammate. They'll open it and see your progress. When they tick their items, they send their link back to you.</p>
+    <div class="share-row">
+      <div class="share-url" id="share-url-display">Generating…</div>
+      <button class="copy-btn" id="copy-btn" onclick="copyLink()">Copy link</button>
+    </div>
+  </div>
+
+  <div id="sections-container"></div>
+
+  <div class="add-section-row">
+    <input id="new-section-input" placeholder="Add a new section…" />
+    <button onclick="addSection()">+ Add section</button>
+  </div>
+
+  <p class="footer-note">State is encoded in the URL — no server, no login required.</p>
+</div>
+
+<script>
+const DEFAULT_SECTIONS = [
+  {id:"sharepoint",title:"📁 SharePoint",open:true,tasks:[
+    {id:"sp1",text:"Audit all Dial a Nerd SharePoint sites",note:"Document site names, URLs, owners and purpose",done:false},
+    {id:"sp2",text:"Identify sites shared with Turrito",note:"Note the specific permissions and sharing config for each",done:false},
+    {id:"sp3",text:"Transfer site ownership to the designated DAN contact",done:false},
+    {id:"sp4",text:"Update or remove Turrito sharing on shared sites",note:"Confirm with Turrito what access they still need after departure",done:false},
+    {id:"sp5",text:"Export a list of all site members and permission levels",done:false},
+    {id:"sp6",text:"Remove your admin access from all DAN sites",done:false},
+    {id:"sp7",text:"Hand over any site branding or design assets",note:"Logos, themes, templates",done:false}
+  ]},
+  {id:"powerautomate",title:"⚡ Power Automate",open:false,tasks:[
+    {id:"pa1",text:"List all flows owned by you that run for DAN",done:false},
+    {id:"pa2",text:"Document what each flow does, its trigger, and dependencies",done:false},
+    {id:"pa3",text:"Transfer flow ownership to DAN's designated owner",done:false},
+    {id:"pa4",text:"Check for shared connections or connectors your account owns",note:"These may break if your access is removed before transfer",done:false},
+    {id:"pa5",text:"Test all flows still run after ownership transfer",done:false},
+    {id:"pa6",text:"Hand over credentials for any service accounts used in flows",done:false}
+  ]},
+  {id:"security",title:"🔐 Security groups & Halo licences",open:false,tasks:[
+    {id:"sec1",text:"Export a full list of all DAN security groups you manage",done:false},
+    {id:"sec2",text:"Document the purpose of each group and who the business owner is",done:false},
+    {id:"sec3",text:"Identify which groups control Halo licence assignment",done:false},
+    {id:"sec4",text:"Transfer ownership/management of all groups to DAN's IT contact",done:false},
+    {id:"sec5",text:"Confirm Halo licence assignments are correct and reconciled before handover",done:false},
+    {id:"sec6",text:"Document the onboarding/offboarding process for Halo licence changes",done:false}
+  ]},
+  {id:"assets",title:"🖥️ Staff assets",open:false,tasks:[
+    {id:"as1",text:"Export the current asset register for all DAN staff",done:false},
+    {id:"as2",text:"Confirm asset register is up to date (no outstanding returns)",done:false},
+    {id:"as3",text:"Hand over asset management responsibilities to DAN's designated contact",done:false},
+    {id:"as4",text:"Document the process for assigning and recovering assets",done:false}
+  ]},
+  {id:"onedrive",title:"☁️ OneDrive archiving",open:false,tasks:[
+    {id:"od1",text:"Document the current OneDrive archiving process you follow",done:false},
+    {id:"od2",text:"Hand over the staff offboarding form workflow to DAN's IT contact",done:false},
+    {id:"od3",text:"Confirm any in-progress archives are completed before departure",done:false},
+    {id:"od4",text:"Ensure relevant managers have access to all archived OneDrives",done:false},
+    {id:"od5",text:"Transfer any admin access needed to perform future archives",done:false}
+  ]},
+  {id:"halo",title:"🎫 Halo instance",open:false,tasks:[
+    {id:"h1",text:"Document the full Halo configuration you built",note:"Workflows, SLAs, ticket types, teams, agents, integrations",done:false},
+    {id:"h2",text:"Provide admin credentials or transfer admin account ownership",done:false},
+    {id:"h3",text:"Walkthrough session with DAN's Halo owner (or record a screen capture)",done:false},
+    {id:"h4",text:"Document any custom fields, forms or automations you configured",done:false},
+    {id:"h5",text:"Hand over API keys or integration credentials tied to your account",done:false}
+  ]},
+  {id:"reports",title:"📊 Reports, dashboards & automations",open:false,tasks:[
+    {id:"r1",text:"List all reports and dashboards you built for DAN",done:false},
+    {id:"r2",text:"Document data sources, refresh schedules and access requirements",done:false},
+    {id:"r3",text:"Transfer ownership of all reports to DAN's designated contact",done:false},
+    {id:"r4",text:"List all automations you built or manage outside of Power Automate",note:"Scheduled tasks, scripts, third-party tools etc.",done:false},
+    {id:"r5",text:"Hand over any code or scripts with documentation",done:false},
+    {id:"r6",text:"Confirm all automations still run after ownership transfer",done:false}
+  ]},
+  {id:"access",title:"🔑 Access & credentials cleanup",open:false,tasks:[
+    {id:"ac1",text:"Audit all accounts where you have admin access on behalf of DAN",done:false},
+    {id:"ac2",text:"Remove your personal account from all DAN systems after transfer is confirmed",done:false},
+    {id:"ac3",text:"Hand over any shared mailboxes or distribution lists you manage for DAN",done:false},
+    {id:"ac4",text:"Confirm DAN has their own admin access to every system before you step out",done:false}
+  ]},
+  {id:"m365",title:"🏢 Microsoft 365 & Entra ID",open:false,tasks:[
+    {id:"m1",text:"List all admin roles assigned to your account in the DAN tenant",note:"Global Admin, SharePoint Admin, Exchange Admin etc.",done:false},
+    {id:"m2",text:"Transfer each admin role to a DAN-owned account before removing your access",done:false},
+    {id:"m3",text:"Document any conditional access policies or MFA configurations you set up",done:false},
+    {id:"m4",text:"Hand over ownership of any Teams teams/channels you own",note:"Including configured apps, tabs and bots",done:false},
+    {id:"m5",text:"Document any Exchange mail flow rules or connectors you created",done:false},
+    {id:"m6",text:"Confirm DAN has a break-glass or emergency admin account in place",done:false}
+  ]},
+  {id:"licensing",title:"🪪 Licensing",open:false,tasks:[
+    {id:"lic1",text:"Document the current M365 licence types and quantities assigned to DAN staff",done:false},
+    {id:"lic2",text:"Hand over the process for assigning and removing M365 licences on staff changes",done:false},
+    {id:"lic3",text:"List any other software subscriptions you manage on DAN's behalf",done:false},
+    {id:"lic4",text:"Confirm billing ownership is transferred to a DAN contact for all managed licences",done:false}
+  ]},
+  {id:"beecastle",title:"🏰 BeeCastle",open:false,tasks:[
+    {id:"bc1",text:"Decide with DAN whether to rebuild in their own instance or transfer management",note:"This decision gates all other BeeCastle items",done:false},
+    {id:"bc2",text:"If rebuilding — document the full current configuration as a reference",note:"Workflows, templates, settings, integrations",done:false},
+    {id:"bc3",text:"If transferring — hand over admin access and document all configuration",done:false},
+    {id:"bc4",text:"Confirm any BeeCastle integrations with other DAN systems are re-pointed correctly",done:false},
+    {id:"bc5",text:"Test that BeeCastle is fully functional under DAN's ownership before sign-off",done:false}
+  ]},
+  {id:"connectwise",title:"🔗 ConnectWise",open:false,tasks:[
+    {id:"cw1",text:"Export historical agreement data for all DAN agreements",note:"Keep a copy on both sides for reference and audit purposes",done:false},
+    {id:"cw2",text:"Document current licensing numbers for all active DAN agreements",done:false},
+    {id:"cw3",text:"Confirm which agreements are shared with or visible to Turrito",note:"Clarify what happens to those after DAN leaves",done:false},
+    {id:"cw4",text:"Cancel ConnectWise Automate licences for DAN",note:"Confirm cancellation date and notice period to avoid overbilling",done:false},
+    {id:"cw5",text:"Confirm all billing is reconciled up to the cancellation date",done:false},
+    {id:"cw6",text:"Hand over or close out any open ConnectWise tickets for DAN",done:false}
+  ]},
+  {id:"cognito",title:"📋 Cognito Forms",open:false,tasks:[
+    {id:"cf1",text:"List all DAN forms currently on the shared Cognito account",done:false},
+    {id:"cf2",text:"Clarify with DAN and Turrito how the shared account will be handled",note:"Options: DAN gets own account, forms exported/rebuilt, or transferred",done:false},
+    {id:"cf3",text:"Export all DAN form definitions and any stored submission data",done:false},
+    {id:"cf4",text:"If DAN is moving to their own account — rebuild or migrate all their forms",done:false},
+    {id:"cf5",text:"Update any Power Automate flows or integrations connecting to those Cognito forms",done:false},
+    {id:"cf6",text:"Confirm Turrito's forms are unaffected by the separation",done:false},
+    {id:"cf7",text:"Hand over Cognito admin access for DAN's forms to their designated contact",done:false}
+  ]},
+  {id:"claude",title:"🤖 Claude discount campaign automation",open:false,tasks:[
+    {id:"cl1",text:"Document how the automation works end-to-end",note:"Trigger, logic, what Claude does, outputs and where they go",done:false},
+    {id:"cl2",text:"Hand over the prompt(s) and any system instructions used",done:false},
+    {id:"cl3",text:"Confirm the Anthropic API key is under a DAN-owned account",note:"If under your account, a new key must be issued to DAN before cutover",done:false},
+    {id:"cl4",text:"Transfer or recreate any integration layer that calls the automation",done:false},
+    {id:"cl5",text:"Test the automation end-to-end under DAN's ownership before sign-off",done:false},
+    {id:"cl6",text:"Confirm ongoing API costs will be billed to DAN's own Anthropic account",done:false}
+  ]},
+  {id:"signoff",title:"📝 Documentation & sign-off",open:false,tasks:[
+    {id:"so1",text:"Prepare a handover summary document covering all the above",done:false},
+    {id:"so2",text:"Get sign-off from DAN confirming receipt of all handover items",done:false},
+    {id:"so3",text:"Agree on a support window (e.g. 2 weeks post-handover) if needed",done:false},
+    {id:"so4",text:"Notify any third-party vendors of the contact change",note:"e.g. Halo, Microsoft, Cognito",done:false}
+  ]}
+];
+
+let state = { sections: JSON.parse(JSON.stringify(DEFAULT_SECTIONS)) };
+
+// ── URL encode/decode (only stores done task IDs — compact) ──────────────────
+function encodeState() {
+  const slim = state.sections
+    .map(s => ({ i: s.id, d: s.tasks.filter(t => t.done).map(t => t.id) }))
+    .filter(s => s.d.length > 0);
+  if (!slim.length) return '';
+  try {
+    return btoa(unescape(encodeURIComponent(JSON.stringify({ s: slim }))));
+  } catch(e) { return ''; }
+}
+
+function decodeState(b64) {
+  try {
+    const slim = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    const doneMap = {};
+    (slim.s || []).forEach(s => s.d.forEach(tid => { doneMap[tid] = true; }));
+    state.sections.forEach(sec => {
+      sec.tasks.forEach(t => { t.done = !!doneMap[t.id]; });
+    });
+  } catch(e) {}
+}
+
+function loadFromHash() {
+  const m = window.location.hash.match(/#dan=(.+)/);
+  if (m) decodeState(m[1]);
+}
+
+function buildShareURL() {
+  const encoded = encodeState();
+  const base = window.location.href.split('#')[0];
+  return encoded ? base + '#dan=' + encoded : base;
+}
+
+function updateShareURL() {
+  document.getElementById('share-url-display').textContent = buildShareURL();
+}
+
+function copyLink() {
+  const url = buildShareURL();
+  const btn = document.getElementById('copy-btn');
+  const finish = () => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy link'; btn.classList.remove('copied'); }, 2000);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(finish).catch(() => fallbackCopy(url, finish));
+  } else {
+    fallbackCopy(url, finish);
+  }
+}
+
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  cb();
+}
+
+// ── State mutations ──────────────────────────────────────────────────────────
+function toggleSection(id) {
+  const s = state.sections.find(x => x.id === id);
+  if (s) s.open = !s.open;
+  render();
+}
+
+function toggleTask(sid, tid) {
+  const s = state.sections.find(x => x.id === sid);
+  if (!s) return;
+  const t = s.tasks.find(x => x.id === tid);
+  if (t) t.done = !t.done;
+  render();
+}
+
+function deleteTask(sid, tid) {
+  const s = state.sections.find(x => x.id === sid);
+  if (!s) return;
+  s.tasks = s.tasks.filter(x => x.id !== tid);
+  render();
+}
+
+function deleteSection(sid) {
+  if (!confirm('Delete this section and all its tasks?')) return;
+  state.sections = state.sections.filter(x => x.id !== sid);
+  render();
+}
+
+function addTask(sid) {
+  const inp = document.getElementById('nt-' + sid);
+  const text = inp.value.trim();
+  if (!text) return;
+  const s = state.sections.find(x => x.id === sid);
+  if (!s) return;
+  s.tasks.push({ id: 't' + Date.now(), text, done: false });
+  inp.value = '';
+  render();
+}
+
+function addSection() {
+  const inp = document.getElementById('new-section-input');
+  const title = inp.value.trim();
+  if (!title) return;
+  state.sections.push({ id: 's' + Date.now(), title, open: true, tasks: [] });
+  inp.value = '';
+  render();
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function render() {
+  // Progress
+  let total = 0, done = 0;
+  state.sections.forEach(s => s.tasks.forEach(t => { total++; if (t.done) done++; }));
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('pbar').style.width = pct + '%';
+  document.getElementById('pstat').textContent = done + ' / ' + total + ' (' + pct + '%)';
+
+  updateShareURL();
+
+  const container = document.getElementById('sections-container');
+  container.innerHTML = '';
+
+  state.sections.forEach(sec => {
+    const tot = sec.tasks.length;
+    const dn = sec.tasks.filter(t => t.done).length;
+    const complete = tot > 0 && dn === tot;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'section';
+
+    // Header
+    const hdr = document.createElement('div');
+    hdr.className = 'section-header';
+    hdr.innerHTML =
+      '<span class="chevron' + (sec.open ? ' open' : '') + '">&#9654;</span>' +
+      '<span class="section-title">' + esc(sec.title) + '</span>' +
+      '<span class="section-meta' + (complete ? ' complete' : '') + '">' + dn + '/' + tot + '</span>' +
+      '<span class="del-section" title="Delete section" onclick="event.stopPropagation();deleteSection(\'' + sec.id + '\')">&#10005;</span>';
+    hdr.addEventListener('click', () => toggleSection(sec.id));
+    wrap.appendChild(hdr);
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'section-body' + (sec.open ? ' open' : '');
+
+    sec.tasks.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML =
+        '<input type="checkbox" class="task-check" ' + (t.done ? 'checked' : '') +
+        ' onchange="toggleTask(\'' + sec.id + '\',\'' + t.id + '\')">' +
+        '<div class="task-content">' +
+        '<span class="task-text' + (t.done ? ' done' : '') + '">' + esc(t.text) + '</span>' +
+        (t.note ? '<span class="task-note">' + esc(t.note) + '</span>' : '') +
+        '</div>' +
+        '<span class="task-del" title="Delete" onclick="deleteTask(\'' + sec.id + '\',\'' + t.id + '\')">&#10005;</span>';
+      body.appendChild(row);
+    });
+
+    // Add task row
+    const addRow = document.createElement('div');
+    addRow.className = 'add-task-row';
+    addRow.innerHTML =
+      '<input id="nt-' + sec.id + '" placeholder="Add a task…" onkeydown="if(event.key===\'Enter\')addTask(\'' + sec.id + '\')">' +
+      '<button onclick="addTask(\'' + sec.id + '\')">Add</button>';
+    body.appendChild(addRow);
+
+    wrap.appendChild(body);
+    container.appendChild(wrap);
+  });
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+loadFromHash();
+render();
+</script>
+</body>
+</html>
