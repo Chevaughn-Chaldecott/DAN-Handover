@@ -86,21 +86,22 @@
     <input id="new-section-input" placeholder="Add a new section…" />
     <button onclick="addSection()">+ Add section</button>
   </div>
-  <p class="footer-note">Synced via JSONStorage · no login required · polls every 7s</p>
+  <p class="footer-note">Synced via GitHub · polls every 7s</p>
 </div>
 <script>
 // ── CONFIGURATION ─────────────────────────────────────────────────────────────
-// After first run, paste your JSONStorage URL here so all teammates share the same bucket.
-// Leave as-is on first run — it will be created automatically.
-const HARDCODED_URL = 'YOUR_JSONSTORAGE_URL';
+const GH_TOKEN = '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';
+const GH_OWNER = 'Chevaughn-Chaldecott';
+const GH_REPO  = 'DAN-Handover';
+const GH_FILE  = 'checklist-state.json';
 // ─────────────────────────────────────────────────────────────────────────────
 
-const STORAGE_LOCAL_KEY = 'dan-checklist-storage-url';
+const GH_API = 'https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE;
 const POLL_MS = 7000;
 
-let storageUrl = null;
 let state = { sections: [] };
 let lastSavedJSON = null;
+let lastFileSHA = null;
 let saveTimer = null;
 let pollTimer = null;
 let isSaving = false;
@@ -224,83 +225,64 @@ function setStatus(status,text){
   document.getElementById('stxt').textContent=text;
 }
 
-function showBanner(html){
-  document.getElementById('banner-area').innerHTML='<div class="banner green">'+html+'</div>';
-}
 
-async function createBucket(){
-  setStatus('syncing','Creating shared storage bucket…');
-  const res=await fetch('https://jsonblob.com/api/jsonBlob',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify({init:true})
+async function loadFromGitHub(){
+  const res=await fetch(GH_API+'?t='+Date.now(),{
+    headers:{
+      'Authorization':'token '+GH_TOKEN,
+      'Accept':'application/vnd.github.v3+json'
+    }
   });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  // JSONBlob returns the URL in the Location header
-  const url=res.headers.get('Location');
-  if(!url) throw new Error('No Location header returned');
-  return url;
+  if(res.status===404) return null; // file doesn't exist yet
+  if(!res.ok) throw new Error('GitHub load failed: HTTP '+res.status);
+  const file=await res.json();
+  lastFileSHA=file.sha;
+  const decoded=JSON.parse(atob(file.content.replace(/\n/g,'')));
+  return decoded;
 }
 
-async function loadFromStorage(){
-  const res=await fetch(storageUrl,{
-    headers:{'Accept':'application/json'}
-  });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  return await res.json();
-}
-
-async function saveToStorage(data){
-  const res=await fetch(storageUrl,{
+async function saveToGitHub(data){
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+  const body={
+    message:'Update checklist state',
+    content:content,
+    ...(lastFileSHA?{sha:lastFileSHA}:{})
+  };
+  const res=await fetch(GH_API,{
     method:'PUT',
-    headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify(data)
+    headers:{
+      'Authorization':'token '+GH_TOKEN,
+      'Accept':'application/vnd.github.v3+json',
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify(body)
   });
-  if(!res.ok) throw new Error('HTTP '+res.status);
+  if(!res.ok){
+    const err=await res.json().catch(()=>({}));
+    // If SHA conflict (someone else saved), reload and retry
+    if(res.status===409||res.status===422){
+      const fresh=await loadFromGitHub();
+      if(fresh){
+        // merge: keep our done states, use their structure
+        lastSavedJSON=JSON.stringify(fresh);
+      }
+      throw new Error('Conflict — please try again');
+    }
+    throw new Error('GitHub save failed: HTTP '+res.status+' '+JSON.stringify(err));
+  }
+  const result=await res.json();
+  lastFileSHA=result.content.sha;
 }
 
 async function initStorage(){
-  if(HARDCODED_URL&&HARDCODED_URL!=='YOUR_JSONSTORAGE_URL'){
-    storageUrl=HARDCODED_URL;
-    localStorage.setItem(STORAGE_LOCAL_KEY,storageUrl);
-  } else {
-    const saved=localStorage.getItem(STORAGE_LOCAL_KEY);
-    if(saved){
-      storageUrl=saved;
-    } else {
-      try{
-        storageUrl=await createBucket();
-        localStorage.setItem(STORAGE_LOCAL_KEY,storageUrl);
-        state={sections:JSON.parse(JSON.stringify(DEFAULT_SECTIONS))};
-        lastSavedJSON=JSON.stringify(state);
-        render();
-        startPolling();
-        setStatus('ok','Storage ready');
-        showBanner(
-          '<strong>✓ Storage bucket created!</strong> One more step to share with your teammate:<br><br>'+
-          '1. Open this HTML file in a text editor (Notepad, VS Code, etc.)<br>'+
-          '2. Find <code>YOUR_JSONSTORAGE_URL</code> and replace it with:<br><br>'+
-          '<code>'+storageUrl+'</code><br><br>'+
-          '3. Save and re-upload to GitHub Pages. Done — both of you will now share this bucket automatically.'
-        );
-        return;
-      }catch(e){
-        setStatus('err','Could not create storage: '+e.message);
-        state={sections:JSON.parse(JSON.stringify(DEFAULT_SECTIONS))};
-        render();
-        return;
-      }
-    }
-  }
-
   setStatus('syncing','Loading checklist…');
   try{
-    const data=await loadFromStorage();
+    const data=await loadFromGitHub();
     if(data&&data.sections&&data.sections.length>0){
       state=data;
     } else {
       state={sections:JSON.parse(JSON.stringify(DEFAULT_SECTIONS))};
-      await saveToStorage(state);
+      await saveToGitHub(state);
     }
     lastSavedJSON=JSON.stringify(state);
     setStatus('ok','Synced · auto-saves on every change');
@@ -317,23 +299,24 @@ function scheduleSave(){
   clearTimeout(saveTimer);
   setStatus('syncing','Saving…');
   saveTimer=setTimeout(async()=>{
-    if(isSaving||!storageUrl) return;
+    if(isSaving) return;
     isSaving=true;
     try{
-      await saveToStorage(state);
+      await saveToGitHub(state);
       lastSavedJSON=JSON.stringify(state);
       setStatus('ok','Saved · '+new Date().toLocaleTimeString());
     }catch(e){
       setStatus('err','Save failed: '+e.message);
     }
     isSaving=false;
-  },600);
+  },800);
 }
 
 async function pollForChanges(){
-  if(isSaving||!storageUrl) return;
+  if(isSaving) return;
   try{
-    const data=await loadFromStorage();
+    const data=await loadFromGitHub();
+    if(!data) return;
     const incoming=JSON.stringify(data);
     if(incoming&&incoming!==lastSavedJSON){
       const openMap={};
