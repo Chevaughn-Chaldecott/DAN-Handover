@@ -230,20 +230,22 @@ function showBanner(html){
 
 async function createBucket(){
   setStatus('syncing','Creating shared storage bucket…');
-  const res=await fetch('https://api.jsonstorage.net/v1/json',{
+  const res=await fetch('https://jsonblob.com/api/jsonBlob',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({sections:DEFAULT_SECTIONS})
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({init:true})
   });
   if(!res.ok) throw new Error('HTTP '+res.status);
-  const data=await res.json();
-  const url=data.uri||data.url;
-  if(!url) throw new Error('No URL returned');
+  // JSONBlob returns the URL in the Location header
+  const url=res.headers.get('Location');
+  if(!url) throw new Error('No Location header returned');
   return url;
 }
 
 async function loadFromStorage(){
-  const res=await fetch(storageUrl);
+  const res=await fetch(storageUrl,{
+    headers:{'Accept':'application/json'}
+  });
   if(!res.ok) throw new Error('HTTP '+res.status);
   return await res.json();
 }
@@ -251,7 +253,7 @@ async function loadFromStorage(){
 async function saveToStorage(data){
   const res=await fetch(storageUrl,{
     method:'PUT',
-    headers:{'Content-Type':'application/json'},
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
     body:JSON.stringify(data)
   });
   if(!res.ok) throw new Error('HTTP '+res.status);
