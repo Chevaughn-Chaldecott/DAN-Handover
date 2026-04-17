@@ -6,388 +6,105 @@
 <title>DAN Handover Checklist</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
-
   :root {
-    --bg: #f7f6f3;
-    --surface: #ffffff;
-    --border: #e2e0d9;
-    --border-hover: #c8c5bc;
-    --text: #1a1917;
-    --text-muted: #6b6860;
-    --text-faint: #a8a59e;
-    --green: #1a7a4a;
-    --green-bg: #edf7f2;
-    --green-border: #b3ddc7;
-    --amber: #92600a;
-    --amber-bg: #fef8ee;
-    --red: #c0392b;
-    --red-bg: #fdf2f1;
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'IBM Plex Sans', sans-serif;
+    --bg:#f7f6f3;--surface:#ffffff;--border:#e2e0d9;--border-hover:#c8c5bc;
+    --text:#1a1917;--text-muted:#6b6860;--text-faint:#a8a59e;
+    --green:#1a7a4a;--amber:#92600a;--red:#c0392b;--red-bg:#fdf2f1;
+    --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 2rem 1rem 4rem;
-  }
-
-  .page {
-    max-width: 760px;
-    margin: 0 auto;
-  }
-
-  /* Header */
-  .page-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .page-header h1 {
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
-    margin-bottom: 3px;
-  }
-
-  .page-header p {
-    font-size: 14px;
-    color: var(--text-muted);
-  }
-
-  /* Progress */
-  .progress-block {
-    margin-bottom: 1.5rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .progress-track {
-    flex: 1;
-    height: 6px;
-    background: var(--border);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 6px;
-    background: var(--green);
-    border-radius: 3px;
-    transition: width 0.4s ease;
-    width: 0%;
-  }
-
-  .progress-label {
-    font-size: 13px;
-    font-family: var(--mono);
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-
-  /* Share box */
-  .share-box {
-    background: var(--amber-bg);
-    border: 1px solid #e8d5a8;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 1.5rem;
-  }
-
-  .share-box p {
-    font-size: 13px;
-    color: var(--amber);
-    margin-bottom: 10px;
-    line-height: 1.5;
-  }
-
-  .share-row {
-    display: flex;
-    gap: 8px;
-  }
-
-  .share-url {
-    flex: 1;
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 7px 10px;
-    border: 1px solid #e8d5a8;
-    border-radius: 6px;
-    background: #fffdf7;
-    color: var(--text-muted);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: default;
-  }
-
-  .copy-btn {
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 7px 14px;
-    background: var(--amber);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: opacity 0.15s;
-  }
-
-  .copy-btn:hover { opacity: 0.88; }
-  .copy-btn.copied { background: var(--green); }
-
-  /* Sections */
-  .section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 8px;
-    overflow: hidden;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.1s;
-  }
-
-  .section-header:hover { background: #faf9f7; }
-
-  .chevron {
-    font-size: 10px;
-    color: var(--text-faint);
-    transition: transform 0.2s;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .chevron.open { transform: rotate(90deg); }
-
-  .section-title {
-    font-size: 14px;
-    font-weight: 500;
-    flex: 1;
-  }
-
-  .section-meta {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-faint);
-    white-space: nowrap;
-  }
-
-  .section-meta.complete { color: var(--green); }
-
-  .del-section {
-    font-size: 12px;
-    color: var(--text-faint);
-    padding: 2px 4px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: color 0.1s, background 0.1s;
-  }
-  .del-section:hover { color: var(--red); background: var(--red-bg); }
-
-  .section-body {
-    border-top: 1px solid var(--border);
-    display: none;
-  }
-
-  .section-body.open { display: block; }
-
-  /* Tasks */
-  .task-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 9px 16px;
-    border-bottom: 1px solid #f0ede8;
-    transition: background 0.1s;
-  }
-
-  .task-row:last-of-type { border-bottom: none; }
-  .task-row:hover { background: #faf9f7; }
-
-  .task-check {
-    width: 15px;
-    height: 15px;
-    min-width: 15px;
-    cursor: pointer;
-    margin-top: 3px;
-    accent-color: var(--green);
-  }
-
-  .task-content { flex: 1; }
-
-  .task-text {
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--text);
-  }
-
-  .task-text.done {
-    text-decoration: line-through;
-    color: var(--text-faint);
-  }
-
-  .task-note {
-    font-size: 12px;
-    color: var(--text-faint);
-    margin-top: 2px;
-    font-style: italic;
-    line-height: 1.4;
-  }
-
-  .task-del {
-    font-size: 12px;
-    color: var(--text-faint);
-    padding: 2px 4px;
-    cursor: pointer;
-    border-radius: 4px;
-    opacity: 0;
-    transition: opacity 0.1s, color 0.1s;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .task-row:hover .task-del { opacity: 1; }
-  .task-del:hover { color: var(--red); }
-
-  /* Add task row */
-  .add-task-row {
-    display: flex;
-    gap: 8px;
-    padding: 8px 16px;
-    background: #faf9f7;
-    border-top: 1px solid #f0ede8;
-  }
-
-  .add-task-row input {
-    flex: 1;
-    font-family: var(--sans);
-    font-size: 13px;
-    padding: 5px 9px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--surface);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
-  .add-task-row input:focus { border-color: var(--border-hover); }
-  .add-task-row input::placeholder { color: var(--text-faint); }
-
-  .add-task-row button {
-    font-family: var(--sans);
-    font-size: 12px;
-    padding: 5px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--surface);
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
-  }
-
-  .add-task-row button:hover { border-color: var(--border-hover); color: var(--text); }
-
-  /* Add section */
-  .add-section-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 1rem;
-  }
-
-  .add-section-row input {
-    flex: 1;
-    font-family: var(--sans);
-    font-size: 13px;
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
-  .add-section-row input:focus { border-color: var(--border-hover); }
-  .add-section-row input::placeholder { color: var(--text-faint); }
-
-  .add-section-row button {
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 8px 16px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
-    white-space: nowrap;
-  }
-
-  .add-section-row button:hover { border-color: var(--border-hover); color: var(--text); }
-
-  .footer-note {
-    margin-top: 2rem;
-    font-size: 12px;
-    color: var(--text-faint);
-    text-align: center;
-    font-family: var(--mono);
-  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;padding:2rem 1rem 4rem}
+  .page{max-width:760px;margin:0 auto}
+  .page-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  .page-header h1{font-size:22px;font-weight:600;letter-spacing:-0.3px;margin-bottom:3px}
+  .page-header p{font-size:14px;color:var(--text-muted)}
+  .status-row{display:flex;align-items:center;gap:8px;margin-bottom:1.5rem;font-size:12px;font-family:var(--mono);color:var(--text-faint)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;transition:background 0.2s}
+  .dot.syncing{background:#e8a020}.dot.err{background:var(--red)}
+  .progress-block{margin-bottom:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+  .progress-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+  .progress-fill{height:6px;background:var(--green);border-radius:3px;transition:width 0.4s ease;width:0%}
+  .progress-label{font-size:13px;font-family:var(--mono);color:var(--text-muted);white-space:nowrap}
+  .section{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden}
+  .section-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;transition:background 0.1s}
+  .section-header:hover{background:#faf9f7}
+  .chevron{font-size:10px;color:var(--text-faint);transition:transform 0.2s;flex-shrink:0}
+  .chevron.open{transform:rotate(90deg)}
+  .section-title{font-size:14px;font-weight:500;flex:1}
+  .section-meta{font-family:var(--mono);font-size:11px;color:var(--text-faint);white-space:nowrap}
+  .section-meta.complete{color:var(--green)}
+  .del-section{font-size:12px;color:var(--text-faint);padding:2px 4px;cursor:pointer;border-radius:4px;transition:color 0.1s,background 0.1s}
+  .del-section:hover{color:var(--red);background:var(--red-bg)}
+  .section-body{border-top:1px solid var(--border);display:none}
+  .section-body.open{display:block}
+  .task-row{display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f0ede8;transition:background 0.1s}
+  .task-row:last-of-type{border-bottom:none}
+  .task-row:hover{background:#faf9f7}
+  .task-check{width:15px;height:15px;min-width:15px;cursor:pointer;margin-top:3px;accent-color:var(--green)}
+  .task-content{flex:1}
+  .task-text{font-size:13px;line-height:1.5;color:var(--text)}
+  .task-text.done{text-decoration:line-through;color:var(--text-faint)}
+  .task-note{font-size:12px;color:var(--text-faint);margin-top:2px;font-style:italic;line-height:1.4}
+  .task-del{font-size:12px;color:var(--text-faint);padding:2px 4px;cursor:pointer;border-radius:4px;opacity:0;transition:opacity 0.1s,color 0.1s;flex-shrink:0;margin-top:2px}
+  .task-row:hover .task-del{opacity:1}
+  .task-del:hover{color:var(--red)}
+  .add-task-row{display:flex;gap:8px;padding:8px 16px;background:#faf9f7;border-top:1px solid #f0ede8}
+  .add-task-row input{flex:1;font-family:var(--sans);font-size:13px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.15s}
+  .add-task-row input:focus{border-color:var(--border-hover)}
+  .add-task-row input::placeholder{color:var(--text-faint)}
+  .add-task-row button{font-family:var(--sans);font-size:12px;padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-muted);cursor:pointer;transition:border-color 0.15s,color 0.15s}
+  .add-task-row button:hover{border-color:var(--border-hover);color:var(--text)}
+  .add-section-row{display:flex;gap:8px;margin-top:1rem}
+  .add-section-row input{flex:1;font-family:var(--sans);font-size:13px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.15s}
+  .add-section-row input:focus{border-color:var(--border-hover)}
+  .add-section-row input::placeholder{color:var(--text-faint)}
+  .add-section-row button{font-family:var(--sans);font-size:13px;font-weight:500;padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-muted);cursor:pointer;white-space:nowrap;transition:border-color 0.15s,color 0.15s}
+  .add-section-row button:hover{border-color:var(--border-hover);color:var(--text)}
+  .footer-note{margin-top:2rem;font-size:12px;color:var(--text-faint);text-align:center;font-family:var(--mono)}
+  .banner{border-radius:10px;padding:14px 16px;margin-bottom:1.5rem;font-size:13px;line-height:1.6;word-break:break-all}
+  .banner.green{background:#edf7f2;border:1px solid #b3ddc7;color:#1a7a4a}
+  .banner code{font-family:var(--mono);font-size:11px;background:#d4f0e3;padding:2px 6px;border-radius:3px}
 </style>
 </head>
 <body>
 <div class="page">
-
   <div class="page-header">
     <h1>DAN Handover Checklist</h1>
-    <p>Dial a Nerd departure checklist — tick items, then copy the shareable link to sync with your teammate.</p>
+    <p>Dial a Nerd departure checklist — changes save automatically and sync for all teammates.</p>
   </div>
-
+  <div id="banner-area"></div>
+  <div class="status-row">
+    <span class="dot syncing" id="sdot"></span>
+    <span id="stxt">Connecting…</span>
+  </div>
   <div class="progress-block">
     <div class="progress-track"><div class="progress-fill" id="pbar"></div></div>
     <div class="progress-label" id="pstat">0 / 0</div>
   </div>
-
-  <div class="share-box">
-    <p>&#128279; Tick your items, then click <strong>Copy link</strong> and send it to your teammate. They'll open it and see your progress. When they tick their items, they send their link back to you.</p>
-    <div class="share-row">
-      <div class="share-url" id="share-url-display">Generating…</div>
-      <button class="copy-btn" id="copy-btn" onclick="copyLink()">Copy link</button>
-    </div>
-  </div>
-
   <div id="sections-container"></div>
-
   <div class="add-section-row">
     <input id="new-section-input" placeholder="Add a new section…" />
     <button onclick="addSection()">+ Add section</button>
   </div>
-
-  <p class="footer-note">State is encoded in the URL — no server, no login required.</p>
+  <p class="footer-note">Synced via JSONStorage · no login required · polls every 7s</p>
 </div>
-
 <script>
+// ── CONFIGURATION ─────────────────────────────────────────────────────────────
+// After first run, paste your JSONStorage URL here so all teammates share the same bucket.
+// Leave as-is on first run — it will be created automatically.
+const HARDCODED_URL = 'YOUR_JSONSTORAGE_URL';
+// ─────────────────────────────────────────────────────────────────────────────
+
+const STORAGE_LOCAL_KEY = 'dan-checklist-storage-url';
+const POLL_MS = 7000;
+
+let storageUrl = null;
+let state = { sections: [] };
+let lastSavedJSON = null;
+let saveTimer = null;
+let pollTimer = null;
+let isSaving = false;
+
 const DEFAULT_SECTIONS = [
   {id:"sharepoint",title:"📁 SharePoint",open:true,tasks:[
     {id:"sp1",text:"Audit all Dial a Nerd SharePoint sites",note:"Document site names, URLs, owners and purpose",done:false},
@@ -502,191 +219,181 @@ const DEFAULT_SECTIONS = [
   ]}
 ];
 
-let state = { sections: JSON.parse(JSON.stringify(DEFAULT_SECTIONS)) };
-
-// ── URL encode/decode (only stores done task IDs — compact) ──────────────────
-function encodeState() {
-  const slim = state.sections
-    .map(s => ({ i: s.id, d: s.tasks.filter(t => t.done).map(t => t.id) }))
-    .filter(s => s.d.length > 0);
-  if (!slim.length) return '';
-  try {
-    return btoa(unescape(encodeURIComponent(JSON.stringify({ s: slim }))));
-  } catch(e) { return ''; }
+function setStatus(status,text){
+  document.getElementById('sdot').className='dot'+(status==='ok'?'':status==='syncing'?' syncing':' err');
+  document.getElementById('stxt').textContent=text;
 }
 
-function decodeState(b64) {
-  try {
-    const slim = JSON.parse(decodeURIComponent(escape(atob(b64))));
-    const doneMap = {};
-    (slim.s || []).forEach(s => s.d.forEach(tid => { doneMap[tid] = true; }));
-    state.sections.forEach(sec => {
-      sec.tasks.forEach(t => { t.done = !!doneMap[t.id]; });
-    });
-  } catch(e) {}
+function showBanner(html){
+  document.getElementById('banner-area').innerHTML='<div class="banner green">'+html+'</div>';
 }
 
-function loadFromHash() {
-  const m = window.location.hash.match(/#dan=(.+)/);
-  if (m) decodeState(m[1]);
+async function createBucket(){
+  setStatus('syncing','Creating shared storage bucket…');
+  const res=await fetch('https://api.jsonstorage.net/v1/json',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sections:DEFAULT_SECTIONS})
+  });
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const data=await res.json();
+  const url=data.uri||data.url;
+  if(!url) throw new Error('No URL returned');
+  return url;
 }
 
-function buildShareURL() {
-  const encoded = encodeState();
-  const base = window.location.href.split('#')[0];
-  return encoded ? base + '#dan=' + encoded : base;
+async function loadFromStorage(){
+  const res=await fetch(storageUrl);
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return await res.json();
 }
 
-function updateShareURL() {
-  document.getElementById('share-url-display').textContent = buildShareURL();
+async function saveToStorage(data){
+  const res=await fetch(storageUrl,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(data)
+  });
+  if(!res.ok) throw new Error('HTTP '+res.status);
 }
 
-function copyLink() {
-  const url = buildShareURL();
-  const btn = document.getElementById('copy-btn');
-  const finish = () => {
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy link'; btn.classList.remove('copied'); }, 2000);
-  };
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(url).then(finish).catch(() => fallbackCopy(url, finish));
+async function initStorage(){
+  if(HARDCODED_URL&&HARDCODED_URL!=='YOUR_JSONSTORAGE_URL'){
+    storageUrl=HARDCODED_URL;
+    localStorage.setItem(STORAGE_LOCAL_KEY,storageUrl);
   } else {
-    fallbackCopy(url, finish);
+    const saved=localStorage.getItem(STORAGE_LOCAL_KEY);
+    if(saved){
+      storageUrl=saved;
+    } else {
+      try{
+        storageUrl=await createBucket();
+        localStorage.setItem(STORAGE_LOCAL_KEY,storageUrl);
+        state={sections:JSON.parse(JSON.stringify(DEFAULT_SECTIONS))};
+        lastSavedJSON=JSON.stringify(state);
+        render();
+        startPolling();
+        setStatus('ok','Storage ready');
+        showBanner(
+          '<strong>✓ Storage bucket created!</strong> One more step to share with your teammate:<br><br>'+
+          '1. Open this HTML file in a text editor (Notepad, VS Code, etc.)<br>'+
+          '2. Find <code>YOUR_JSONSTORAGE_URL</code> and replace it with:<br><br>'+
+          '<code>'+storageUrl+'</code><br><br>'+
+          '3. Save and re-upload to GitHub Pages. Done — both of you will now share this bucket automatically.'
+        );
+        return;
+      }catch(e){
+        setStatus('err','Could not create storage: '+e.message);
+        state={sections:JSON.parse(JSON.stringify(DEFAULT_SECTIONS))};
+        render();
+        return;
+      }
+    }
+  }
+
+  setStatus('syncing','Loading checklist…');
+  try{
+    const data=await loadFromStorage();
+    if(data&&data.sections&&data.sections.length>0){
+      state=data;
+    } else {
+      state={sections:JSON.parse(JSON.stringify(DEFAULT_SECTIONS))};
+      await saveToStorage(state);
+    }
+    lastSavedJSON=JSON.stringify(state);
+    setStatus('ok','Synced · auto-saves on every change');
+    render();
+    startPolling();
+  }catch(e){
+    setStatus('err','Load failed: '+e.message);
+    state={sections:JSON.parse(JSON.stringify(DEFAULT_SECTIONS))};
+    render();
   }
 }
 
-function fallbackCopy(text, cb) {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed'; ta.style.opacity = '0';
-  document.body.appendChild(ta); ta.select();
-  document.execCommand('copy');
-  document.body.removeChild(ta);
-  cb();
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  setStatus('syncing','Saving…');
+  saveTimer=setTimeout(async()=>{
+    if(isSaving||!storageUrl) return;
+    isSaving=true;
+    try{
+      await saveToStorage(state);
+      lastSavedJSON=JSON.stringify(state);
+      setStatus('ok','Saved · '+new Date().toLocaleTimeString());
+    }catch(e){
+      setStatus('err','Save failed: '+e.message);
+    }
+    isSaving=false;
+  },600);
 }
 
-// ── State mutations ──────────────────────────────────────────────────────────
-function toggleSection(id) {
-  const s = state.sections.find(x => x.id === id);
-  if (s) s.open = !s.open;
-  render();
+async function pollForChanges(){
+  if(isSaving||!storageUrl) return;
+  try{
+    const data=await loadFromStorage();
+    const incoming=JSON.stringify(data);
+    if(incoming&&incoming!==lastSavedJSON){
+      const openMap={};
+      state.sections.forEach(s=>{openMap[s.id]=s.open;});
+      state=data;
+      state.sections.forEach(s=>{if(openMap[s.id]!==undefined)s.open=openMap[s.id];});
+      lastSavedJSON=incoming;
+      render();
+      setStatus('ok','Updated from teammate · '+new Date().toLocaleTimeString());
+    }
+  }catch(e){}
 }
 
-function toggleTask(sid, tid) {
-  const s = state.sections.find(x => x.id === sid);
-  if (!s) return;
-  const t = s.tasks.find(x => x.id === tid);
-  if (t) t.done = !t.done;
-  render();
+function startPolling(){
+  clearInterval(pollTimer);
+  pollTimer=setInterval(pollForChanges,POLL_MS);
 }
 
-function deleteTask(sid, tid) {
-  const s = state.sections.find(x => x.id === sid);
-  if (!s) return;
-  s.tasks = s.tasks.filter(x => x.id !== tid);
-  render();
-}
+function toggleSection(id){const s=state.sections.find(x=>x.id===id);if(s)s.open=!s.open;render();}
+function toggleTask(sid,tid){const s=state.sections.find(x=>x.id===sid);if(!s)return;const t=s.tasks.find(x=>x.id===tid);if(t)t.done=!t.done;render();scheduleSave();}
+function deleteTask(sid,tid){const s=state.sections.find(x=>x.id===sid);if(!s)return;s.tasks=s.tasks.filter(x=>x.id!==tid);render();scheduleSave();}
+function deleteSection(sid){if(!confirm('Delete this section?'))return;state.sections=state.sections.filter(x=>x.id!==sid);render();scheduleSave();}
+function addTask(sid){const inp=document.getElementById('nt-'+sid);const text=inp.value.trim();if(!text)return;const s=state.sections.find(x=>x.id===sid);if(!s)return;s.tasks.push({id:'t'+Date.now(),text,done:false});inp.value='';render();scheduleSave();}
+function addSection(){const inp=document.getElementById('new-section-input');const title=inp.value.trim();if(!title)return;state.sections.push({id:'s'+Date.now(),title,open:true,tasks:[]});inp.value='';render();scheduleSave();}
 
-function deleteSection(sid) {
-  if (!confirm('Delete this section and all its tasks?')) return;
-  state.sections = state.sections.filter(x => x.id !== sid);
-  render();
-}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-function addTask(sid) {
-  const inp = document.getElementById('nt-' + sid);
-  const text = inp.value.trim();
-  if (!text) return;
-  const s = state.sections.find(x => x.id === sid);
-  if (!s) return;
-  s.tasks.push({ id: 't' + Date.now(), text, done: false });
-  inp.value = '';
-  render();
-}
-
-function addSection() {
-  const inp = document.getElementById('new-section-input');
-  const title = inp.value.trim();
-  if (!title) return;
-  state.sections.push({ id: 's' + Date.now(), title, open: true, tasks: [] });
-  inp.value = '';
-  render();
-}
-
-// ── Render ───────────────────────────────────────────────────────────────────
-function esc(s) {
-  return String(s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function render() {
-  // Progress
-  let total = 0, done = 0;
-  state.sections.forEach(s => s.tasks.forEach(t => { total++; if (t.done) done++; }));
-  const pct = total ? Math.round(done / total * 100) : 0;
-  document.getElementById('pbar').style.width = pct + '%';
-  document.getElementById('pstat').textContent = done + ' / ' + total + ' (' + pct + '%)';
-
-  updateShareURL();
-
-  const container = document.getElementById('sections-container');
-  container.innerHTML = '';
-
-  state.sections.forEach(sec => {
-    const tot = sec.tasks.length;
-    const dn = sec.tasks.filter(t => t.done).length;
-    const complete = tot > 0 && dn === tot;
-
-    const wrap = document.createElement('div');
-    wrap.className = 'section';
-
-    // Header
-    const hdr = document.createElement('div');
-    hdr.className = 'section-header';
-    hdr.innerHTML =
-      '<span class="chevron' + (sec.open ? ' open' : '') + '">&#9654;</span>' +
-      '<span class="section-title">' + esc(sec.title) + '</span>' +
-      '<span class="section-meta' + (complete ? ' complete' : '') + '">' + dn + '/' + tot + '</span>' +
-      '<span class="del-section" title="Delete section" onclick="event.stopPropagation();deleteSection(\'' + sec.id + '\')">&#10005;</span>';
-    hdr.addEventListener('click', () => toggleSection(sec.id));
+function render(){
+  let total=0,done=0;
+  state.sections.forEach(s=>s.tasks.forEach(t=>{total++;if(t.done)done++;}));
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('pbar').style.width=pct+'%';
+  document.getElementById('pstat').textContent=done+' / '+total+' ('+pct+'%)';
+  const container=document.getElementById('sections-container');
+  container.innerHTML='';
+  state.sections.forEach(sec=>{
+    const tot=sec.tasks.length,dn=sec.tasks.filter(t=>t.done).length,complete=tot>0&&dn===tot;
+    const wrap=document.createElement('div');wrap.className='section';
+    const hdr=document.createElement('div');hdr.className='section-header';
+    hdr.innerHTML='<span class="chevron'+(sec.open?' open':'')+'">&#9654;</span>'+
+      '<span class="section-title">'+esc(sec.title)+'</span>'+
+      '<span class="section-meta'+(complete?' complete':'')+'">'+dn+'/'+tot+'</span>'+
+      '<span class="del-section" onclick="event.stopPropagation();deleteSection(\''+sec.id+'\')">&#10005;</span>';
+    hdr.addEventListener('click',()=>toggleSection(sec.id));
     wrap.appendChild(hdr);
-
-    // Body
-    const body = document.createElement('div');
-    body.className = 'section-body' + (sec.open ? ' open' : '');
-
-    sec.tasks.forEach(t => {
-      const row = document.createElement('div');
-      row.className = 'task-row';
-      row.innerHTML =
-        '<input type="checkbox" class="task-check" ' + (t.done ? 'checked' : '') +
-        ' onchange="toggleTask(\'' + sec.id + '\',\'' + t.id + '\')">' +
-        '<div class="task-content">' +
-        '<span class="task-text' + (t.done ? ' done' : '') + '">' + esc(t.text) + '</span>' +
-        (t.note ? '<span class="task-note">' + esc(t.note) + '</span>' : '') +
-        '</div>' +
-        '<span class="task-del" title="Delete" onclick="deleteTask(\'' + sec.id + '\',\'' + t.id + '\')">&#10005;</span>';
+    const body=document.createElement('div');body.className='section-body'+(sec.open?' open':'');
+    sec.tasks.forEach(t=>{
+      const row=document.createElement('div');row.className='task-row';
+      row.innerHTML='<input type="checkbox" class="task-check" '+(t.done?'checked':'')+' onchange="toggleTask(\''+sec.id+'\',\''+t.id+'\')">'+
+        '<div class="task-content"><span class="task-text'+(t.done?' done':'')+'">'+esc(t.text)+'</span>'+
+        (t.note?'<span class="task-note">'+esc(t.note)+'</span>':'')+
+        '</div><span class="task-del" onclick="deleteTask(\''+sec.id+'\',\''+t.id+'\')">&#10005;</span>';
       body.appendChild(row);
     });
-
-    // Add task row
-    const addRow = document.createElement('div');
-    addRow.className = 'add-task-row';
-    addRow.innerHTML =
-      '<input id="nt-' + sec.id + '" placeholder="Add a task…" onkeydown="if(event.key===\'Enter\')addTask(\'' + sec.id + '\')">' +
-      '<button onclick="addTask(\'' + sec.id + '\')">Add</button>';
-    body.appendChild(addRow);
-
-    wrap.appendChild(body);
-    container.appendChild(wrap);
+    const ar=document.createElement('div');ar.className='add-task-row';
+    ar.innerHTML='<input id="nt-'+sec.id+'" placeholder="Add a task…" onkeydown="if(event.key===\'Enter\')addTask(\''+sec.id+'\')"><button onclick="addTask(\''+sec.id+'\')">Add</button>';
+    body.appendChild(ar);wrap.appendChild(body);container.appendChild(wrap);
   });
 }
 
-// ── Init ─────────────────────────────────────────────────────────────────────
-loadFromHash();
 render();
+initStorage();
 </script>
 </body>
 </html>
